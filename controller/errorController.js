@@ -21,19 +21,21 @@ const sendErrorProd = (error, res) => {
   const stack = error.stack;
 
   if (error.isOperational) {
-    res.status(statusCode).json({
+    
+    return res.status(statusCode).json({
       status,
       message,
       
     });
+  }
     console.log(error.name,error.message,stack)
     return res.status(500).json({
 
       status: 'error',
-      message: 'Something went wrong'
+      message: 'Something went very wrong'
 
     })
-  }
+  
 };
 
 
@@ -41,6 +43,9 @@ const sendErrorProd = (error, res) => {
 
 
 const globalErrorHandler = (err, req, res, next) => {
+  if(err.name === 'JsonWebTokenError'){
+    err= new AppError('Invalid token',401);
+  }
 
   if(err.name === 'SequelizeValidationError'){
     err= new AppError(err.errors[0].message,400);
